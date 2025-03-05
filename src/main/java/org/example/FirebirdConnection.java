@@ -70,14 +70,16 @@ public class FirebirdConnection {
         }
     }
 
-    // Método para construir a query SQL para produtos em oferta
+    // Método para construir a query SQL para produtos em oferta com validação de data
     private static String buildQueryOferta() {
         return "SELECT P.ID_PRODUTO, P.DESCRICAO, T.PREC_OFERTA, T.INIC_OFERTA, T.FINA_OFERTA " +
                 "FROM TPRECOS T " +
                 "JOIN TPRODUTOS P ON T.ID_PRODUTO = P.ID_PRODUTO " +
                 "WHERE P.EH_ACOUGUE = 1 " +
-                "AND (T.PREC_OFERTA > 0 )";
+                "AND T.PREC_OFERTA > 0 " +
+                "AND CURRENT_DATE BETWEEN T.INIC_OFERTA AND T.FINA_OFERTA";
     }
+
 
     // Método para executar a consulta de produtos em oferta e exibir os resultados
     private static void executeQueryOferta(Connection connection, String sql) {
@@ -92,11 +94,14 @@ public class FirebirdConnection {
                 Date dataInicialOferta = resultSet.getDate("INIC_OFERTA");
                 Date dataFinalOferta = resultSet.getDate("FINA_OFERTA");
 
-
-                System.out.println("ID Produto: " + idProduto + ", Descrição: " + descricao + ", Preço de Oferta: " + precoOferta + ", Data incial da oferta: " + dataInicialOferta +", Data final da oferta: " + dataFinalOferta);
+                System.out.println("ID Produto: " + idProduto + ", Descrição: " + descricao +
+                        ", Preço de Oferta: " + precoOferta + ", Data inicial da oferta: " +
+                        dataInicialOferta + ", Data final da oferta: " + dataFinalOferta);
             }
         } catch (SQLException e) {
             System.err.println("Erro ao executar a consulta: " + e.getMessage());
         }
     }
+
 }
+
