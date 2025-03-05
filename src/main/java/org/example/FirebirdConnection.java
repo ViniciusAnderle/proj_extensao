@@ -20,10 +20,6 @@ public class FirebirdConnection {
                 String sqlAçougue = buildQueryAçougue();
                 executeQuery(connection, sqlAçougue);
 
-                // Consulta para obter produtos em oferta
-                String sqlOferta = buildQueryOferta();
-                executeQueryOferta(connection, sqlOferta);
-
                 // Consulta para obter produtos de aves
                 String sqlAves = buildQueryAves();
                 executeQuery(connection, sqlAves);
@@ -31,6 +27,10 @@ public class FirebirdConnection {
                 // Consulta para obter outros produtos
                 String sqlOutros = buildQueryOutros();
                 executeQuery(connection, sqlOutros);
+
+                // Consulta para obter produtos em oferta
+                String sqlOferta = buildQueryOferta();
+                executeQueryOferta(connection, sqlOferta);
             } else {
                 System.out.println("Falha ao conectar ao banco de dados.");
             }
@@ -99,10 +99,10 @@ public class FirebirdConnection {
         return "SELECT P.ID_PRODUTO, P.DESCRICAO, T.PREC_OFERTA, T.INIC_OFERTA, T.FINA_OFERTA " +
                 "FROM TPRECOS T " +
                 "JOIN TPRODUTOS P ON T.ID_PRODUTO = P.ID_PRODUTO " +
-                "WHERE P.TABELA1 = '10' " +  // Para produtos de açougue em oferta
                 "AND T.PREC_OFERTA > 0 " +
                 "AND CURRENT_DATE BETWEEN T.INIC_OFERTA AND T.FINA_OFERTA";
     }
+
 
     // Método para executar a consulta de produtos em oferta e exibir os resultados
     private static void executeQueryOferta(Connection connection, String sql) {
@@ -125,4 +125,6 @@ public class FirebirdConnection {
             System.err.println("Erro ao executar a consulta: " + e.getMessage());
         }
     }
+
+
 }
