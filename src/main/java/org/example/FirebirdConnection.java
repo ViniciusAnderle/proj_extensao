@@ -45,10 +45,11 @@ public class FirebirdConnection {
 
     // Método para construir a query SQL
     private static String buildQuery() {
-        return "SELECT ID_PRODUTO, DESCRICAO, PERC_IPI FROM TPRODUTOS WHERE " +
-                "(EH_ACOUGUE = 1)";
+        return "SELECT P.ID_PRODUTO, P.DESCRICAO, T.PREC_VENDA, T.MARG_VENDA, T.PREC_OFERTA " +
+                "FROM TPRECOS T " +
+                "JOIN TPRODUTOS P ON T.ID_PRODUTO = P.ID_PRODUTO " +
+                "WHERE P.EH_ACOUGUE = 1";
     }
-
 
     // Método para executar a consulta e exibir os resultados
     private static void executeQuery(Connection connection, String sql) {
@@ -59,9 +60,9 @@ public class FirebirdConnection {
             while (resultSet.next()) {
                 int idProduto = resultSet.getInt("ID_PRODUTO");
                 String descricao = resultSet.getString("DESCRICAO");
-                double percIpi = resultSet.getDouble("PERC_IPI");
+                double preco = resultSet.getDouble("PREC_VENDA");
 
-                System.out.println("ID Produto: " + idProduto + ", Descrição: " + descricao + ", % IPI: " + percIpi);
+                System.out.println("ID Produto: " + idProduto + ", Descrição: " + descricao + ", Preço: " + preco);
             }
         } catch (SQLException e) {
             System.err.println("Erro ao executar a consulta: " + e.getMessage());
