@@ -15,13 +15,18 @@ public class FirebirdConnection {
     private static final String PASSWORD = "masterkey";
 
     public static void main(String[] args) {
-        // Conecta ao banco e realiza a consulta
+        // Conecta ao banco e realiza as consultas
         try (Connection connection = createConnection()) {
             if (connection != null) {
                 System.out.println("Conectado ao banco Firebird com sucesso!");
+
+                // Consulta para obter produtos
                 String sql = buildQuery();
                 executeQuery(connection, sql);
-                executeQueryOferta(connection, sql);
+
+                // Consulta para obter produtos em oferta
+                String sqlOferta = buildQueryOferta();
+                executeQueryOferta(connection, sqlOferta);
             } else {
                 System.out.println("Falha ao conectar ao banco de dados.");
             }
@@ -44,7 +49,7 @@ public class FirebirdConnection {
         return null;
     }
 
-    // Método para construir a query SQL
+    // Método para construir a query SQL para produtos
     private static String buildQuery() {
         return "SELECT P.ID_PRODUTO, P.DESCRICAO, T.PREC_VENDA, T.MARG_VENDA, T.PREC_OFERTA " +
                 "FROM TPRECOS T " +
@@ -69,17 +74,16 @@ public class FirebirdConnection {
         }
     }
 
-
-    // Método para construir a query SQL para buscar produtos em oferta
+    // Método para construir a query SQL para produtos em oferta
     private static String buildQueryOferta() {
         return "SELECT P.ID_PRODUTO, P.DESCRICAO, T.PREC_OFERTA, T.INIC_OFERTA, T.FINA_OFERTA " +
                 "FROM TPRECOS T " +
                 "JOIN TPRODUTOS P ON T.ID_PRODUTO = P.ID_PRODUTO " +
                 "WHERE P.EH_ACOUGUE = 1 " +
-                "AND CURRENT_DATE BETWEEN T.INIC_OFERTA AND T.FINA_OFERTA";
+                "AND (T.PREC_OFERTA > 0 )";
     }
 
-    // Método para executar a consulta e exibir os resultados em oferta
+    // Método para executar a consulta de produtos em oferta e exibir os resultados
     private static void executeQueryOferta(Connection connection, String sql) {
         try (Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(sql)) {
