@@ -21,6 +21,7 @@ public class FirebirdConnection {
                 System.out.println("Conectado ao banco Firebird com sucesso!");
                 String sql = buildQuery();
                 executeQuery(connection, sql);
+                executeQueryOferta(connection, sql);
             } else {
                 System.out.println("Falha ao conectar ao banco de dados.");
             }
@@ -55,7 +56,6 @@ public class FirebirdConnection {
     private static void executeQuery(Connection connection, String sql) {
         try (Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(sql)) {
-
             System.out.println("Produtos encontrados:");
             while (resultSet.next()) {
                 int idProduto = resultSet.getInt("ID_PRODUTO");
@@ -63,6 +63,34 @@ public class FirebirdConnection {
                 double preco = resultSet.getDouble("PREC_VENDA");
 
                 System.out.println("ID Produto: " + idProduto + ", Descrição: " + descricao + ", Preço: " + preco);
+            }
+        } catch (SQLException e) {
+            System.err.println("Erro ao executar a consulta: " + e.getMessage());
+        }
+    }
+
+
+    // Método para construir a query SQL para buscar produtos em oferta
+    private static String buildQueryOferta() {
+        return "SELECT P.ID_PRODUTO, P.DESCRICAO, T.PREC_OFERTA, T.INIC_OFERTA, T.FINA_OFERTA " +
+                "FROM TPRECOS T " +
+                "JOIN TPRODUTOS P ON T.ID_PRODUTO = P.ID_PRODUTO " +
+                "WHERE P.EH_ACOUGUE = 1 " +
+                "AND CURRENT_DATE BETWEEN T.INIC_OFERTA AND T.FINA_OFERTA";
+    }
+
+    // Método para executar a consulta e exibir os resultados em oferta
+    private static void executeQueryOferta(Connection connection, String sql) {
+        try (Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(sql)) {
+            System.out.println();
+            System.out.println("Produtos em oferta encontrados:");
+            while (resultSet.next()) {
+                int idProduto = resultSet.getInt("ID_PRODUTO");
+                String descricao = resultSet.getString("DESCRICAO");
+                double precoOferta = resultSet.getDouble("PREC_OFERTA");
+
+                System.out.println("ID Produto: " + idProduto + ", Descrição: " + descricao + ", Preço de Oferta: " + precoOferta);
             }
         } catch (SQLException e) {
             System.err.println("Erro ao executar a consulta: " + e.getMessage());
