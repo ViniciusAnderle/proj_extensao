@@ -1,10 +1,6 @@
 package org.example;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 
 public class FirebirdConnection {
 
@@ -93,8 +89,11 @@ public class FirebirdConnection {
                 int idProduto = resultSet.getInt("ID_PRODUTO");
                 String descricao = resultSet.getString("DESCRICAO");
                 double precoOferta = resultSet.getDouble("PREC_OFERTA");
+                Date dataInicialOferta = resultSet.getDate("INIC_OFERTA");
+                Date dataFinalOferta = resultSet.getDate("FINA_OFERTA");
 
-                System.out.println("ID Produto: " + idProduto + ", Descrição: " + descricao + ", Preço de Oferta: " + precoOferta);
+
+                System.out.println("ID Produto: " + idProduto + ", Descrição: " + descricao + ", Preço de Oferta: " + precoOferta + ", Data incial da oferta: " + dataInicialOferta +", Data final da oferta: " + dataFinalOferta);
             }
         } catch (SQLException e) {
             System.err.println("Erro ao executar a consulta: " + e.getMessage());
