@@ -15,7 +15,6 @@
     </properties>
 
     <dependencies>
-        <!-- Dependência específica para o JDK 21 -->
         <dependency>
             <groupId>org.firebirdsql.jdbc</groupId>
             <artifactId>jaybird-jdk21</artifactId>
