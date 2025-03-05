@@ -18,15 +18,19 @@ public class FirebirdConnection {
 
                 // Consulta para obter produtos de açougue
                 String sqlAçougue = buildQueryAçougue();
-                executeQuery(connection, sqlAçougue);
+                executeQuery(connection, sqlAçougue, "Açougue");
 
                 // Consulta para obter produtos de aves
                 String sqlAves = buildQueryAves();
-                executeQuery(connection, sqlAves);
+                executeQuery(connection, sqlAves, "Aves");
+
+                // Consulta para obter produtos bovinos
+                String sqlBovinos = buildQueryBovinos();
+                executeQuery(connection, sqlBovinos, "Bovinos");
 
                 // Consulta para obter outros produtos
                 String sqlOutros = buildQueryOutros();
-                executeQuery(connection, sqlOutros);
+                executeQuery(connection, sqlOutros, "Outros");
 
                 // Consulta para obter produtos em oferta
                 String sqlOferta = buildQueryOferta();
@@ -66,7 +70,15 @@ public class FirebirdConnection {
         return "SELECT P.ID_PRODUTO, P.DESCRICAO, T.PREC_VENDA, T.MARG_VENDA, T.PREC_OFERTA " +
                 "FROM TPRECOS T " +
                 "JOIN TPRODUTOS P ON T.ID_PRODUTO = P.ID_PRODUTO " +
-                "WHERE P.TABELA1 = '12'";  // Para produtos de aves
+                "WHERE P.TABELA1 = '12'";  // Para produtos de aves (frango)
+    }
+
+    // Método para construir a query SQL para produtos bovinos
+    private static String buildQueryBovinos() {
+        return "SELECT P.ID_PRODUTO, P.DESCRICAO, T.PREC_VENDA, T.MARG_VENDA, T.PREC_OFERTA " +
+                "FROM TPRECOS T " +
+                "JOIN TPRODUTOS P ON T.ID_PRODUTO = P.ID_PRODUTO " +
+                "WHERE P.TABELA1 = '11'";  // Para produtos bovinos
     }
 
     // Método para construir a query SQL para outros produtos
@@ -78,10 +90,10 @@ public class FirebirdConnection {
     }
 
     // Método para executar a consulta e exibir os resultados
-    private static void executeQuery(Connection connection, String sql) {
+    private static void executeQuery(Connection connection, String sql, String categoria) {
         try (Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(sql)) {
-            System.out.println("Produtos encontrados:");
+            System.out.println("\nProdutos encontrados para a categoria: " + categoria);
             while (resultSet.next()) {
                 int idProduto = resultSet.getInt("ID_PRODUTO");
                 String descricao = resultSet.getString("DESCRICAO");
@@ -102,7 +114,6 @@ public class FirebirdConnection {
                 "AND T.PREC_OFERTA > 0 " +
                 "AND CURRENT_DATE BETWEEN T.INIC_OFERTA AND T.FINA_OFERTA";
     }
-
 
     // Método para executar a consulta de produtos em oferta e exibir os resultados
     private static void executeQueryOferta(Connection connection, String sql) {
@@ -125,6 +136,4 @@ public class FirebirdConnection {
             System.err.println("Erro ao executar a consulta: " + e.getMessage());
         }
     }
-
-
 }
