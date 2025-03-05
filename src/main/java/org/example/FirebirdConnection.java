@@ -7,31 +7,64 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class FirebirdConnection {
+
+    // URL de conexão com o banco Firebird
+    private static final String URL = "jdbc:firebirdsql://localhost:3050/" + System.getProperty("user.home") + "/sol.fdb";
+    // Credenciais de acesso ao banco Firebird
+    private static final String USER = "SYSDBA";
+    private static final String PASSWORD = "masterkey";
+
     public static void main(String[] args) {
-        String url = "jdbc:firebirdsql://localhost:3050/" + System.getProperty("user.home") + "/sol.fdb";
-        String user = "SYSDBA";
-        String password = "masterkey";
-
-        try (Connection connection = DriverManager.getConnection(url, user, password);
-             Statement statement = connection.createStatement()) {
-
-            System.out.println("Conectado ao banco Firebird com sucesso!");
-
-            String sql = "SELECT ID_PRODUTO, DESCRICAO, PERC_IPI FROM TPRODUTOS;";
-
-            try (ResultSet resultSet = statement.executeQuery(sql)) {
-                System.out.println("Dados da tabela TPRODUTOS:");
-                while (resultSet.next()) {
-                    int idProduto = resultSet.getInt("ID_PRODUTO");
-                    String descricao = resultSet.getString("DESCRICAO");
-                    double percIpi = resultSet.getDouble("PERC_IPI");
-
-                    System.out.println("ID_PRODUTO: " + idProduto + ", DESCRICAO: " + descricao + ", PERC_IPI: " + percIpi);
-                }
+        // Conecta ao banco e realiza a consulta
+        try (Connection connection = createConnection()) {
+            if (connection != null) {
+                System.out.println("Conectado ao banco Firebird com sucesso!");
+                String sql = buildQuery();
+                executeQuery(connection, sql);
+            } else {
+                System.out.println("Falha ao conectar ao banco de dados.");
             }
-
         } catch (SQLException e) {
             e.printStackTrace();
+        }
+    }
+
+    // Método para criar a conexão com o banco de dados
+    private static Connection createConnection() {
+        try {
+            // Verifica se o driver Firebird está carregado
+            Class.forName("org.firebirdsql.jdbc.FBDriver");
+            return DriverManager.getConnection(URL, USER, PASSWORD);
+        } catch (ClassNotFoundException e) {
+            System.err.println("Driver do Firebird não encontrado: " + e.getMessage());
+        } catch (SQLException e) {
+            System.err.println("Erro ao tentar conectar ao banco de dados: " + e.getMessage());
+        }
+        return null;
+    }
+
+    // Método para construir a query SQL
+    private static String buildQuery() {
+        return "SELECT ID_PRODUTO, DESCRICAO, PERC_IPI FROM TPRODUTOS WHERE " +
+                "(EH_ACOUGUE = 1)";
+    }
+
+
+    // Método para executar a consulta e exibir os resultados
+    private static void executeQuery(Connection connection, String sql) {
+        try (Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(sql)) {
+
+            System.out.println("Produtos encontrados:");
+            while (resultSet.next()) {
+                int idProduto = resultSet.getInt("ID_PRODUTO");
+                String descricao = resultSet.getString("DESCRICAO");
+                double percIpi = resultSet.getDouble("PERC_IPI");
+
+                System.out.println("ID Produto: " + idProduto + ", Descrição: " + descricao + ", % IPI: " + percIpi);
+            }
+        } catch (SQLException e) {
+            System.err.println("Erro ao executar a consulta: " + e.getMessage());
         }
     }
 }
